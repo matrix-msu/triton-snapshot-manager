@@ -1,5 +1,24 @@
 #!/usr/bin/env node
 
+// Tool to automate the taking and deleting of snapshots in Triton SDC.
+//
+// This tool is intended to be run as a cron job at the maximum frequency
+// that a snapshot needs to be taken.  The job will interogate the cloudapi
+// for instances with the following tags or mdata set:
+//
+// edu.msu.matrix:snapshotfrequency
+//   This is a interval expressed as a string of the spacing that will be
+//   the minimum delay between snapshots. Example '1d' one day '3h' hours
+//   '1m' 1 minute.
+//
+// edu.msu.matrix:snapshotminimum
+//   This is the minimum number of snapshots to retain.  Any more snapshots
+//   than this number will be deleted.  Any given run of this tool will delete
+//   at most one snapshot per instance.
+//
+// Setting either one of those will invoke the behavior referenced above.
+// The behaviors can be used individually.
+
 var bunyan = require('bunyan');
 var path = require('path');
 var triton = require('triton'); // typically `require('triton');`
@@ -79,7 +98,7 @@ function maybecreatesnapshot(instance) {
             if (minage != null && age != null) {
                 if (age > minage) {
                     console.log("Creating snapshot for" + JSON.stringify(instance));
-                    globalclient.cloudapi.createMachineSnapshot({
+                    Globalclient.cloudapi.createMachineSnapshot({
                         id: instance.id
                     }, function(err) {
                         if (err) {
