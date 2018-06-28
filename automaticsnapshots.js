@@ -1,15 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * Example creating a Triton API client and using it to list instances.
- *
- * Usage:
- *      ./example-list-instances.js
- *
- *      # With trace-level logging
- *      LOG_LEVEL=trace ./example-list-instances.js 2>&1 | bunyan
- */
-
 var bunyan = require('bunyan');
 var path = require('path');
 var triton = require('triton'); // typically `require('triton');`
@@ -34,6 +24,19 @@ function min(items) {
     return min;
 }
 
+function max(items) {
+    if (items.length == 0) {
+        return null;
+    }
+    var min = items.reduce(
+        (accumulator, currentValue) => {
+            return (accumulator > currentValue ? accumulator : currentValue);
+        }
+    );
+
+    return min;
+}
+
 function sortsnapshots(a,b) {
   if (a.name < b.name)
      return -1;
@@ -43,6 +46,8 @@ function sortsnapshots(a,b) {
 }
 
 function maybecreatesnapshot(instance) {
+    // For the provided instance, fire a snapshot if the frequency of time has passed.
+    //
     globalclient.cloudapi.listMachineSnapshots(instance, function(err, snapshots) {
         if (err) {
             console.error('listMachineSnapshots error: %s\n%s', err, err.stack);
@@ -56,6 +61,8 @@ function maybecreatesnapshot(instance) {
             age = min(ages);
 
             minage = null; // this is the minimum time between snapshots
+
+            // The following logic makes tags override mdata.  The tag is right if the mdata disagrees.
 
             if (instance.metadata["edu.msu.matrix:snapshotfrequency"] != null && instance.tags["edu.msu.matrix:snapshotfrequency"] == null) {
                 minage = parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"])
@@ -109,6 +116,8 @@ function maybedeletesnapshot(instance) {
 
             minsnaps = null;
 
+            // The following logic makes tags override mdata.  The tag is right if the mdata disagrees.
+            //
             if (instance.metadata["edu.msu.matrix:snapshotminimum"] != null && instance.tags["edu.msu.matrix:snapshotminimum"] == null) {
                 minsnaps = (instance.metadata["edu.msu.matrix:snapshotminimum"])
             };
@@ -116,8 +125,9 @@ function maybedeletesnapshot(instance) {
                 minsnaps = (instance.tags["edu.msu.matrix:snapshotminimum"])
             };
             if (instance.tags["edu.msu.matrix:snapshotminimum"] != null && instance.metadata["edu.msu.matrix:snapshotminimum"] != null) {
-                minsnaps = min([parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"]),
-                    (instance.tags["edu.msu.matrix:snapshotfrequency"])
+                minsnaps = max([
+                	(instance.metadata["edu.msu.matrix:snapshotfrequency"]),
+                    	(instance.tags["edu.msu.matrix:snapshotfrequency"])
                 ]);
             };
 
