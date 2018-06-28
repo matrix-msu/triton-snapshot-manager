@@ -55,7 +55,7 @@ function maybecreatesnapshot(instance) {
 
             age = min(ages);
 
-            minage = null;
+            minage = null; // this is the minimum time between snapshots
 
             if (instance.metadata["snapshotfrequency"] != null && instance.tags["snapshotfrequency"] == null) {
                 minage = parseduration(instance.metadata["snapshotfrequency"])
