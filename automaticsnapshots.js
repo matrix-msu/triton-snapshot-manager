@@ -109,22 +109,23 @@ function maybedeletesnapshot(instance) {
 
             minsnaps = null;
 
-            if (instance.metadata["edu.msu.matrix:minsnapshots"] != null && instance.tags["edu.msu.matrix:minsnapshots"] == null) {
-                minsnaps = parseduration(instance.metadata["edu.msu.matrix:minsnapshots"])
+            if (instance.metadata["edu.msu.matrix:snapshotminimum"] != null && instance.tags["edu.msu.matrix:snapshotminimum"] == null) {
+                minsnaps = (instance.metadata["edu.msu.matrix:snapshotminimum"])
             };
-            if (instance.tags["edu.msu.matrix:minsnapshots"] != null && instance.metadata["edu.msu.matrix:minsnapshots"] == null) {
-                minsnaps = parseduration(instance.tags["edu.msu.matrix:minsnapshots"])
+            if (instance.tags["edu.msu.matrix:snapshotminimum"] != null && instance.metadata["edu.msu.matrix:snapshotminimum"] == null) {
+                minsnaps = (instance.tags["edu.msu.matrix:snapshotminimum"])
             };
-            if (instance.tags["edu.msu.matrix:minsnapshots"] != null && instance.metadata["edu.msu.matrix:minsnapshots"] != null) {
+            if (instance.tags["edu.msu.matrix:snapshotminimum"] != null && instance.metadata["edu.msu.matrix:snapshotminimum"] != null) {
                 minsnaps = min([parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"]),
-                    parseduration(instance.tags["edu.msu.matrix:snapshotfrequency"])
+                    (instance.tags["edu.msu.matrix:snapshotfrequency"])
                 ]);
             };
+
 
             if (snaps != null && minsnaps != null) {
                 if (snaps > minsnaps) {
                     console.log("deleting oldest snapshot for" + JSON.stringify(instance));
-                    console.log("deleting oldest snapshot for" + JSON.stringify(snapshots.sort(sortsnapshots)));
+                    console.log("snapshots " + JSON.stringify(snapshots.sort(sortsnapshots)));
                     globalclient.cloudapi.deleteMachineSnapshot({
                         id: instance.id,
                         name: snapshots.sort(sortsnapshots).shift().name
