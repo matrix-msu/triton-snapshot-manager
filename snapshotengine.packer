@@ -1,0 +1,50 @@
+{
+  "variables": {
+    "triton_url": "{{env `SDC_URL`}}",
+    "triton_account": "{{env `SDC_ACCOUNT`}}",
+    "triton_key_id": "{{env `SDC_KEY_ID`}}",
+    "version_suffix": "-{{timestamp}}"
+  },
+  "builders": [
+    {
+      "name": "triton",
+      "type": "triton",
+      "triton_url": "{{user `triton_url`}}",
+      "triton_account": "{{user `triton_account`}}",
+      "triton_key_id": "{{user `triton_key_id`}}",
+      "source_machine_name": "image-builder",
+      "source_machine_package": "sample-1G",
+      "source_machine_image_filter": {
+        "name": "base-64-lts",
+        "most_recent": "true"
+      },
+      "ssh_username": "root",
+      "image_name": "snapshotengine",
+      "image_version": "0.0.1{{user `version_suffix`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell", "inline": [
+        "echo installing make gcc; pkgin -y install gmake gcc49",
+        "echo installing node; pkgin -y install nodejs",
+        "echo installing triton and manta; npm install -g --unsafe-perm triton manta bunyan parse-duration"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "automaticsnapshots.js",
+      "destination": "/home/admin/"
+    },
+    {
+      "type": "shell", "inline": [
+        "echo linking libs; cd /home/admin; npm link triton manta parse-duration;"
+      ]
+    },
+    {
+      "type": "shell", "inline": [
+        "echo DONE" 
+      ]
+    }
+  ]
+}
