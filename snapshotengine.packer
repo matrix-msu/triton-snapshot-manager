@@ -37,8 +37,19 @@
       "destination": "/home/admin/"
     },
     {
+      "type": "file",
+      "source": "cronjob.sh",
+      "destination": "/home/admin/"
+    },
+    {
+      "type": "file",
+      "source": "crontab",
+      "destination": "/home/admin/"
+    },
+    {
       "type": "shell", "inline": [
-        "echo linking libs; cd /home/admin; npm link triton manta parse-duration;"
+        "echo linking libs; cd /home/admin; npm link bunyan triton manta parse-duration;",
+        "echo installing cronjob; cd /home/admin; su admin -c 'crontab crontab';"
       ]
     },
     {
