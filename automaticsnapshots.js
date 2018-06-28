@@ -57,15 +57,15 @@ function maybecreatesnapshot(instance) {
 
             minage = null; // this is the minimum time between snapshots
 
-            if (instance.metadata["snapshotfrequency"] != null && instance.tags["snapshotfrequency"] == null) {
-                minage = parseduration(instance.metadata["snapshotfrequency"])
+            if (instance.metadata["edu.msu.matrix:snapshotfrequency"] != null && instance.tags["edu.msu.matrix:snapshotfrequency"] == null) {
+                minage = parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"])
             };
-            if (instance.tags["snapshotfrequency"] != null && instance.metadata["snapshotfrequency"] == null) {
-                minage = parseduration(instance.tags["snapshotfrequency"])
+            if (instance.tags["edu.msu.matrix:snapshotfrequency"] != null && instance.metadata["edu.msu.matrix:snapshotfrequency"] == null) {
+                minage = parseduration(instance.tags["edu.msu.matrix:snapshotfrequency"])
             };
-            if (instance.tags["snapshotfrequency"] != null && instance.metadata["snapshotfrequency"] != null) {
-                minage = min([parseduration(instance.metadata["snapshotfrequency"]),
-                    parseduration(instance.tags["snapshotfrequency"])
+            if (instance.tags["edu.msu.matrix:snapshotfrequency"] != null && instance.metadata["edu.msu.matrix:snapshotfrequency"] != null) {
+                minage = min([parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"]),
+                    parseduration(instance.tags["edu.msu.matrix:snapshotfrequency"])
                 ]);
             };
 
@@ -109,15 +109,15 @@ function maybedeletesnapshot(instance) {
 
             minsnaps = null;
 
-            if (instance.metadata["minsnapshots"] != null && instance.tags["minsnapshots"] == null) {
-                minsnaps = parseduration(instance.metadata["minsnapshots"])
+            if (instance.metadata["edu.msu.matrix:minsnapshots"] != null && instance.tags["edu.msu.matrix:minsnapshots"] == null) {
+                minsnaps = parseduration(instance.metadata["edu.msu.matrix:minsnapshots"])
             };
-            if (instance.tags["minsnapshots"] != null && instance.metadata["minsnapshots"] == null) {
-                minsnaps = parseduration(instance.tags["minsnapshots"])
+            if (instance.tags["edu.msu.matrix:minsnapshots"] != null && instance.metadata["edu.msu.matrix:minsnapshots"] == null) {
+                minsnaps = parseduration(instance.tags["edu.msu.matrix:minsnapshots"])
             };
-            if (instance.tags["minsnapshots"] != null && instance.metadata["minsnapshots"] != null) {
-                minsnaps = min([parseduration(instance.metadata["snapshotfrequency"]),
-                    parseduration(instance.tags["snapshotfrequency"])
+            if (instance.tags["edu.msu.matrix:minsnapshots"] != null && instance.metadata["edu.msu.matrix:minsnapshots"] != null) {
+                minsnaps = min([parseduration(instance.metadata["edu.msu.matrix:snapshotfrequency"]),
+                    parseduration(instance.tags["edu.msu.matrix:snapshotfrequency"])
                 ]);
             };
 
