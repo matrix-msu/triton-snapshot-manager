@@ -18,6 +18,9 @@
 //
 // Setting either one of those will invoke the behavior referenced above.
 // The behaviors can be used individually.
+//
+// Configuration for account information will be picked up from the environment.
+// It is expected that triton env will have been run before this tool.
 
 var bunyan = require('bunyan');
 var path = require('path');
@@ -27,7 +30,7 @@ var parseduration = require('parse-duration');
 var log = bunyan.createLogger({
     name: path.basename(__filename),
     level: process.env.LOG_LEVEL || 'info',
-    stream: process.stderr
+    stream: process.stdout
 });
 
 function min(items) {
@@ -69,7 +72,7 @@ function maybecreatesnapshot(instance) {
     //
     globalclient.cloudapi.listMachineSnapshots(instance, function(err, snapshots) {
         if (err) {
-            console.error('listMachineSnapshots error: %s\n%s', err, err.stack);
+            log.error( err );
             process.exitStatus = 1;
         } else {
 
@@ -97,24 +100,24 @@ function maybecreatesnapshot(instance) {
 
             if (minage != null && age != null) {
                 if (age > minage) {
-                    console.log("Creating snapshot for" + JSON.stringify(instance));
-                    Globalclient.cloudapi.createMachineSnapshot({
+                    log.info({instance: instance}, "Creating snapshot");
+                    globalclient.cloudapi.createMachineSnapshot({
                         id: instance.id
                     }, function(err) {
                         if (err) {
-                            console.error('createMachineSnapshot error: %s\n%s', err, err.stack);
+                            log.error( err );
                             process.exitStatus = 1;
                         }
                     });
                 }
 
             } else if (minage != null && age == null) {
-                console.log("Creating snapshot for" + JSON.stringify(instance));
+                log.info({instance: instance}, "Creating snapshot");
                 globalclient.cloudapi.createMachineSnapshot({
                     id: instance.id
                 }, function(err) {
                     if (err) {
-                        console.error('createMachineSnapshot error: %s\n%s', err, err.stack);
+                        log.error( err );
                         process.exitStatus = 1;
                     }
                 });
@@ -127,7 +130,7 @@ function maybecreatesnapshot(instance) {
 function maybedeletesnapshot(instance) {
     globalclient.cloudapi.listMachineSnapshots(instance, function(err, snapshots) {
         if (err) {
-            console.error('listMachineSnapshots error: %s\n%s', err, err.stack);
+            log.error( err );
             process.exitStatus = 1;
         } else {
 
@@ -153,14 +156,13 @@ function maybedeletesnapshot(instance) {
 
             if (snaps != null && minsnaps != null) {
                 if (snaps > minsnaps) {
-                    console.log("deleting oldest snapshot for" + JSON.stringify(instance));
-                    console.log("snapshots " + JSON.stringify(snapshots.sort(sortsnapshots)));
+                    log.info({instance: instance, snapshots: snapshots}, "deleting oldest snapshot");
                     globalclient.cloudapi.deleteMachineSnapshot({
                         id: instance.id,
                         name: snapshots.sort(sortsnapshots).shift().name
                     }, function(err) {
                         if (err) {
-                            console.error('deleteMachineSnapshot error: %s\n%s', err, err.stack);
+                            log.error( err );
                             process.exitStatus = 1;
                         }
                     });
@@ -181,7 +183,7 @@ triton.createClient({
     unlockKeyFn: triton.promptPassphraseUnlockKey
 }, function createdClient(err, client) {
     if (err) {
-        console.error('error creating Triton client: %s\n%s', err, err.stack);
+        log.error( err );
         process.exitStatus = 1;
         return;
     }
@@ -190,7 +192,7 @@ triton.createClient({
     client.cloudapi.listMachines(function(err, insts) {
 
         if (err) {
-            console.error('listInstances error: %s\n%s', err, err.stack);
+            log.error( err );
             process.exitStatus = 1;
         } else {
 
